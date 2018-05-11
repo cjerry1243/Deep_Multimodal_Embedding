@@ -13,7 +13,7 @@ Use python2
 ### Prepare Robobarista dataset
 (See: http://robobarista.cs.cornell.edu/dataset)
 
-Modify data_path in line 12 in load_data.py.
+Modify load_data.py in line 12: data_path='path/to/Robobarista/robobarista_dataset/dataset'.
 
 ### Script discription:
 #### Autoencoder pretraining:
