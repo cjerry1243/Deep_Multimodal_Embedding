@@ -26,9 +26,9 @@ def build_training_model(traj_model):
 
 def training_function(training_model):
     def sim(v1, v2):
-        # norm_v1 = K.l2_normalize(v1, axis=-1)
-        # norm_v2 = K.l2_normalize(v2, axis=-1)
-        return K.sum(v1*v2, axis=-1)# K.sum(norm_v1*norm_v2, axis=-1)
+        norm_v1 = K.l2_normalize(v1, axis=-1)
+        norm_v2 = K.l2_normalize(v2, axis=-1)
+        return K.sum(norm_v1*norm_v2, axis=-1)
 
     target_out = training_model.outputs[0]
     relevant_out = training_model.outputs[1]
@@ -90,7 +90,7 @@ def main():
                 #             /(np.linalg.norm(traj_vector)+1e-4)/(np.linalg.norm(traj_embedd)+1e-4)
                 # violate_score = sim_score + alpha*distance_matrix[traj_index]/100
                 #
-                irrelevant_traj_indices = np.argwhere(distance_matrix[path_index, :] > 30).squeeze()
+                irrelevant_traj_indices = np.argwhere(distance_matrix[traj_index, :] > 30).squeeze()
                 irr_traj_index = np.random.choice(irrelevant_traj_indices)
 
                 batch_relevant_index[b] = traj_index
@@ -99,7 +99,7 @@ def main():
 
             batch_relevant_traj = traj_data[batch_relevant_index, ...]
             batch_violate_traj = traj_data[batch_violate_index, ...]
-            batch_margin = distance_matrix[batch_relevant_index, batch_violate_index]#/100
+            batch_margin = distance_matrix[batch_relevant_index, batch_violate_index]/100
 
             ### Updates
             loss = joint_training([batch_target_traj, batch_relevant_traj, batch_violate_traj, batch_margin])[0]
@@ -130,7 +130,7 @@ def test():
     sim_matrix = np.zeros([n_pair, n_pair])
     for i in range(n_pair):
         traj_vector = traj_embedd[i]
-        sim_score = np.sum(traj_vector * traj_embedd, axis=-1)# /np.linalg.norm(traj_vector)/np.linalg.norm(traj_embedd, axis=-1)
+        sim_score = np.sum(traj_vector * traj_embedd, axis=-1)/np.linalg.norm(traj_vector)/np.linalg.norm(traj_embedd, axis=-1)
         sim_matrix[i] = sim_score
         print('traj index:', i, context[i], 'magnitude:', np.linalg.norm(traj_vector))
         print('most relevant:', sim_score.argmax(), context[sim_score.argmax()])
